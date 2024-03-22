@@ -4,7 +4,7 @@
     name: "{{ node_exporter_system_group }}"
     state: present
     system: true
-  when: node_exporter_system_group != "root"
+  when: node_exporter_system_group not in ["root", "nogroup"]
 
 - name: Create the node_exporter user
   ansible.builtin.user:
@@ -15,7 +15,9 @@
     system: true
     create_home: false
     home: /
-  when: node_exporter_system_user != "root"
+  # https://github.com/systemd/systemd/commit/bed0b7dfc0070e920d00c89d9a4fd4db8d974cf0 と反するが
+  # 一時ファイルも作成しないので nobody を許容する
+  when: node_exporter_system_user not in ["root", "nobody"]
 
 - name: Get binary
   when:
